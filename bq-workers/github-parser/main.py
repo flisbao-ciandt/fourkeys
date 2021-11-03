@@ -71,10 +71,6 @@ def index():
 def process_github_event(headers, msg):
     event_type = headers["X-Github-Event"]
     signature = headers["X-Hub-Signature"]
-    source = "github"
-
-    if "Mock" in headers:
-        source += "mock"
 
     types = {"push", "pull_request", "pull_request_review",
              "pull_request_review_comment", "issues",
@@ -86,6 +82,8 @@ def process_github_event(headers, msg):
 
     metadata = json.loads(base64.b64decode(msg["data"]).decode("utf-8").strip())
 
+    source = metadata["repository"]["name"]
+    
     if event_type == "push":
         time_created = metadata["head_commit"]["timestamp"]
         e_id = metadata["head_commit"]["id"]

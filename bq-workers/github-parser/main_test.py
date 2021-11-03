@@ -59,7 +59,7 @@ def test_missing_msg_attributes(client):
 
 def test_github_event_processed(client):
     headers = {"X-Github-Event": "push", "X-Hub-Signature": "foo"}
-    commit = json.dumps({"head_commit": {"timestamp": 0, "id": "bar"}}).encode(
+    commit = json.dumps({"head_commit": {"timestamp": 0, "id": "bar"}, "repository": {"name": "test"}}).encode(
         "utf-8"
     )
     pubsub_msg = {
@@ -77,7 +77,7 @@ def test_github_event_processed(client):
         "time_created": 0,
         "signature": "foo",
         "msg_id": "foobar",
-        "source": "github",
+        "source": "test",
     }
 
     shared.insert_row_into_bigquery = mock.MagicMock()
