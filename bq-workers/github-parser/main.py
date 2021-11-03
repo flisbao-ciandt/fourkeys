@@ -84,7 +84,7 @@ def process_github_event(headers, msg):
 
     # Added this line to insert into my query which repo is sending the status
     source = metadata["repository"]["name"]
-    
+
     if event_type == "push":
         time_created = metadata["head_commit"]["timestamp"]
         e_id = metadata["head_commit"]["id"]
