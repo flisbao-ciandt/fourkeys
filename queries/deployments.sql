@@ -30,7 +30,7 @@ WITH deploys_github AS (
       JOIN
         changes_raw on (
           changes_raw.id = deploys_github.main_commit
-          or changes_raw.id in unnest(deploys.additional_commits)
+          or changes_raw.id in unnest(deploys_github.additional_commits)
         )
     )
 
