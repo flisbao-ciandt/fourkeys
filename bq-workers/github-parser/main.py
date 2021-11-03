@@ -82,6 +82,7 @@ def process_github_event(headers, msg):
 
     metadata = json.loads(base64.b64decode(msg["data"]).decode("utf-8").strip())
 
+    # Added this line to insert into my query which repo is sending the status
     source = metadata["repository"]["name"]
     
     if event_type == "push":
