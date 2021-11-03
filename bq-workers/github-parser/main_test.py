@@ -73,7 +73,7 @@ def test_github_event_processed(client):
     github_event = {
         "event_type": "push",
         "id": "bar",
-        "metadata": '{"head_commit": {"timestamp": 0, "id": "bar"}}',
+        "metadata": '{"head_commit": {"timestamp": 0, "id": "bar"}, "repository": {"name": "test"}}',
         "time_created": 0,
         "signature": "foo",
         "msg_id": "foobar",
