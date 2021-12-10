@@ -115,6 +115,9 @@ def get_source(headers):
     if "Circleci-Event-Type" in headers:
         return "circleci"
 
+    if "Kanbanize" in headers.get("User-Agent", ""):
+        return "kanbanize"
+
     return headers.get("User-Agent")
 
 
@@ -130,5 +133,8 @@ AUTHORIZED_SOURCES = {
         ),
     "circleci": EventSource(
         "Circleci-Signature", circleci_verification
+        ),
+    "kanbanize": EventSource(
+        "X-Kanbanize-Token", simple_token_verification
         ),
 }

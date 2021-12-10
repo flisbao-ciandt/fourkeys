@@ -16,7 +16,7 @@ FROM
     FROM 
       four_keys.events_raw 
     WHERE 
-      event_type = "bug" 
+      event_type = "Bug" 
   ) issue
 LEFT JOIN 
   (

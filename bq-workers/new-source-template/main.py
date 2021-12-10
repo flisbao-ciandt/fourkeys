@@ -16,9 +16,11 @@ import base64
 import os
 import json
 
+
 import shared
 
 from flask import Flask, request
+from google.cloud import bigquery
 
 app = Flask(__name__)
 
@@ -71,13 +73,15 @@ def process_new_source_event(msg):
     e_id = metadata["kanbanizePayload"]["card"]["taskid"]
     created_at = metadata["kanbanizePayload"]["timestamp"]
     signature = shared.create_unique_id(msg)
-    source = metadata["kanbanizePayload"]["card"]["customFields"]["Projeto"]
+    source = metadata["kanbanizePayload"]["card"]["customFields"]["project"]
 
 
     if "Spring Done" in metadata["kanbanizePayload"]["card"]["columnname"]:
-        metadata["kanbanizePayload"]["card"].update({ "closedAt":  metadata["kanbanizePayload"]["timestamp"]})
+        metadata["kanbanizePayload"]["card"].update({ "closedAt":  metadata["kanbanizePayload"]["timestamp"] })
     else:
-        metadata["kanbanizePayload"]["card"].update({ "closedAt":  ""})
+        deploy = find_last_deploy(source)
+        metadata["kanbanizePayload"]["card"].update({ "closedAt":  "", "commit": deploy.main_commit })
+
 
     # [TODO: Parse the msg data to map to the event object below]
     kanbanize_event = {
@@ -94,6 +98,39 @@ def process_new_source_event(msg):
 
     return kanbanize_event
 
+def find_last_deploy(source):
+    client = bigquery.Client()
+
+    query = """
+        SELECT 
+            source, 
+            id as deploy_id, 
+            time_created, 
+            JSON_EXTRACT_SCALAR(metadata, '$.deployment.sha') as main_commit 
+        FROM 
+            four_keys.events_raw 
+        WHERE 
+            event_type = 'deployment_status' and 
+            JSON_EXTRACT_SCALAR(metadata, '$.deployment_status.state') = 'success' and 
+            source = @source 
+        ORDER BY 
+            time_created DESC 
+        LIMIT 1
+    """
+
+    job_config = bigquery.QueryJobConfig(
+        query_parameters=[
+            bigquery.ScalarQueryParameter("source", "STRING", source)
+        ]
+    )
+
+    query_job = client.query(query, job_config=job_config)
+    rows = query_job.result() 
+
+    for row in rows:
+        deploy = row
+
+    return deploy
 
 if __name__ == "__main__":
     PORT = int(os.getenv("PORT")) if os.getenv("PORT") else 8080

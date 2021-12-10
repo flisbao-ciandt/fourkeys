@@ -65,3 +65,28 @@ def is_unique(client, signature):
 def create_unique_id(msg):
     hashed = hashlib.sha1(bytes(json.dumps(msg), "utf-8"))
     return hashed.hexdigest()
+
+def find_last_deploy(source):
+    client = bigquery.Client()
+
+    query = (
+        "SELECT"
+            "source,"
+            "id as deploy_id,"
+            "time_created,"
+            "JSON_EXTRACT_SCALAR(metadata, '$.deployment.sha') as main_commit"
+        "FROM "
+            "four_keys.events_raw"
+        "WHERE "
+            "event_type = 'deployment_status' and "
+            "JSON_EXTRACT_SCALAR(metadata, '$.deployment_status.state') = 'success' and "
+            "source = '%s'"
+        "ORDER BY "
+            "time_created DESC "
+        "LIMIT 1"
+    )
+
+    query_job = client.query(query % source)
+    result = query_job.result()
+    
+    return result
