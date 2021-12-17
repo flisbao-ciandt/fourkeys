@@ -12,7 +12,7 @@ FROM
       JSON_EXTRACT_SCALAR(metadata, '$.kanbanizePayload.card.taskid') as incident_id,
       TIMESTAMP(JSON_EXTRACT_SCALAR(metadata, '$.kanbanizePayload.timestamp')) as time_created,
       TIMESTAMP(JSON_EXTRACT_SCALAR(metadata, '$.kanbanizePayload.card.closedAt')) as time_resolved,
-      JSON_EXTRACT_SCALAR(metadata, '$.kanbanizePayload.card.customFields.RootCause')  as root_cause,
+      JSON_EXTRACT_SCALAR(metadata, '$.kanbanizePayload.card.commit') as root_cause,
     FROM 
       four_keys.events_raw 
     WHERE 

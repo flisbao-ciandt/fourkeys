@@ -122,10 +122,10 @@ def process_github_event(headers, msg):
     if event_type == "deployment_status":
         time_created = metadata["deployment_status"]["updated_at"]
         e_id = metadata["deployment_status"]["id"]
+        description = metadata["deployment"]['description']
+        sha = description.split()
 
-        sha = metadata["deployment"]['sha']
-
-        metadata["deployment"].update({ "additional_sha":  [sha]})
+        metadata["deployment"].update({ "additional_sha":  sha})
 
     if event_type == "status":
         time_created = metadata["updated_at"]

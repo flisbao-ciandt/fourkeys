@@ -76,11 +76,11 @@ def process_new_source_event(msg):
     source = metadata["kanbanizePayload"]["card"]["customFields"]["project"]
 
 
-    if "Spring Done" in metadata["kanbanizePayload"]["card"]["columnname"]:
+    if "Sprint Done" in metadata["kanbanizePayload"]["card"]["columnname"]:
         metadata["kanbanizePayload"]["card"].update({ "closedAt":  metadata["kanbanizePayload"]["timestamp"] })
     else:
         deploy = find_last_deploy(source)
-        metadata["kanbanizePayload"]["card"].update({ "closedAt":  "", "commit": deploy.main_commit })
+        metadata["kanbanizePayload"]["card"].update({ "closedAt":  None, "commit": deploy.main_commit })
 
 
     # [TODO: Parse the msg data to map to the event object below]
